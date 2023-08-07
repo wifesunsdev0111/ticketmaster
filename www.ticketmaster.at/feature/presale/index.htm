@@ -1,0 +1,1812 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="de-AT"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="de-AT"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="de-AT"> <![endif]-->
+<!--[if IE 9]>    <html class="no-js ie9" lang="de-AT"> <![endif]-->
+<!--[if gt IE 9]><!--> <html class="no-js noiefixes" lang="de-AT"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<title>Ticketmaster Presale </title>
+
+    <script type="text/javascript">
+
+    var TMResourceType = {
+        FETCHABLE  : 'fetchable',
+        EXECUTABLE : 'executable'
+    };
+
+    var TMJavascriptElement = function(type, content, flag, name) {
+
+    	var type = type;
+	    var content = content;
+	    var flag = flag;
+	    var name = name;
+
+        this.getType = function() {
+            return type;
+        };
+
+        this.getContent = function() {
+            return content;
+        };
+
+        this.hasFetchTypeFlag = function() {
+            return !(typeof flag === 'undefined');
+        };
+
+        this.getFetchTypeFlag = function() {
+            return flag;
+        };
+
+        this.getName = function() {
+            return name;
+        };
+    };
+
+    var TMJavascriptMember = function(elements, name) {
+
+    	var elements = elements;
+    	var name = name;
+
+        this.addElement = function(element) {
+            elements.push(element);
+        };
+
+        this.getElements = function() {
+            return elements;
+        };
+
+        this.getName = function() {
+            return name;
+        };
+
+    };
+
+    var TMScriptInjector = (function (oHead) {
+
+	    function loadError (oError) {
+		    throw new URIError("The script " + oError.target.src + " is not accessible.");
+	    }
+
+	    return {
+
+	    	inject: function (settings, fOnload) {
+			    var oScript = document.createElement("script");
+			    oScript.type = "text\/javascript";
+			    oScript.onerror = loadError;
+			    if (fOnload) { oScript.onload = fOnload; }
+			    oHead.appendChild(oScript);
+			    if (settings.async) {
+				    oScript.async = true
+			    }
+			    if (settings.defer) {
+				    oScript.defer = true
+			    }
+			    oScript.src = settings.src;
+		    }
+
+        };
+
+    })(document.head || document.getElementsByTagName("head")[0]);
+
+    var TMJavascriptFunctionalQueue = function() {
+
+        var f = function() {
+            var members = [];
+
+            this.addMember = function(member) {
+                members.push(member);
+            };
+
+            this.getMembers = function() {
+                return members;
+            };
+
+            this.putBefore = function(search, member) {
+                var index = 0;
+                for (var y=0; y<members.length; y++) {
+                    var elements = members[y];
+                    for (var z=0; z<elements.length; z++) {
+                        if(elements[z].getType() === TMResourceType.FETCHABLE && search === elements[z].getContent()) {
+                            index = y; // remember member position
+                        }
+                    }
+                }
+                members.splice(index, 0, member);
+            }
+        };
+
+        return new f();
+
+    }();
+
+    var TMJavascriptPerformanceQueue = function() {
+
+        var f = function() {
+            var members = [];
+
+            this.addMember = function(member) {
+                members.push(member);
+            };
+
+            this.getMembers = function() {
+                return members;
+            };
+
+            this.putBefore = function(search, member) {
+                var index = 0;
+                for (var y=0; y<members.length; y++) {
+                    var elements = members[y];
+                    for (var z=0; z<elements.length; z++) {
+                        if(elements[z].getType() === TMResourceType.FETCHABLE && search === elements[z].getContent()) {
+                            index = y; // remember member position
+                        }
+                    }
+                }
+                members.splice(index, 0, member);
+            }
+        };
+
+        return new f();
+
+    }();
+
+    // check for existance of certain property inside the `window` scope and then execute the provided callback
+    var whenAvailable = function (name, callback) {
+        var interval = 10; // ms
+        window.setTimeout(function() {
+            if (window[name]) {
+                callback(window[name]);
+            } else {
+                window.setTimeout(whenAvailable, interval, name, callback);
+            }
+        }, interval);
+    };
+
+    // Check if Evidon execute scripts queue container exists in `window` object only when the DOM has been fully loaded and Evidon script has been fetched
+    // because the Evidon might come later via ContainerTagModule, while this CookieConsentModule always loads first
+    whenAvailable("_DCSEvidonQ", function(event) {
+
+    	// Attaching our own queues to the execution queue found inside the container tags (we do not attach our own queues directly to `window.evidon.priorConsentCallback()` as then we'd override anything done inside the container tags queue)
+	    window._DCSEvidonQ.push({
+		    run: function() {
+
+			    // execute functional scripts first
+			    if (TMJavascriptFunctionalQueue.getMembers().length > 0) {
+				    var members = TMJavascriptFunctionalQueue.getMembers();
+				    for (var i = 0; i < members.length; i++) {
+					    var elements = members[i].getElements();
+					    for (var x = 0; x < elements.length; x++) {
+						    if (elements[x].getType() === TMResourceType.FETCHABLE) {
+							    var settings = {};
+							    settings.src = elements[x].getContent();
+							    if (elements[x].hasFetchTypeFlag()) {
+								    settings[elements[x].getFetchTypeFlag()] = true;
+							    }
+							    TMScriptInjector.inject(settings);
+						    } else {
+							    try {
+							    	elements[x].getContent()();
+                                } catch (e) {
+                                    console && console.log(e);
+                                }
+						    }
+					    }
+				    }
+			    }
+
+			    // execute performance scripts second
+			    if (TMJavascriptPerformanceQueue.getMembers().length > 0) {
+				    var members = TMJavascriptPerformanceQueue.getMembers();
+				    for (var i = 0; i < members.length; i++) {
+					    var elements = members[i].getElements();
+					    for (var x =0; x < elements.length; x++) {
+						    if (elements[x].getType() === TMResourceType.FETCHABLE) {
+							    var settings = {};
+							    settings.src = elements[x].getContent();
+							    if (elements[x].hasFetchTypeFlag()) {
+								    settings[elements[x].getFetchTypeFlag()] = true;
+							    }
+							    TMScriptInjector.inject(settings);
+						    } else {
+							    try {
+								    elements[x].getContent()();
+							    } catch (e) {
+								    console && console.log(e);
+							    }
+						    }
+					    }
+				    }
+			    }
+
+		    },
+		    name: 'MFOL third party Functional + Performance script Queues' // a short descriptive name of the tag being triggered in the run function
+	    });
+
+    });
+
+</script>
+	<script src="../../tmol-dstlxhr.js" async=""></script>
+
+	
+    <meta property="og:image" content="//media.ticketmaster.eu/cdn-at/mnxweb63.0.14/static/images/staticPages/social.png">
+<meta name="twitter:image" content="//media.ticketmaster.eu/cdn-at/mnxweb63.0.14/static/images/staticPages/social.png">
+<meta name="description" content="Sichere dir deine Tickets im Ticketmaster Presale vor allen anderen Fans und erhalte deine Tickets schon vor dem offiziellen Vorverkauf.">
+
+	        <link rel="canonical" href="index.htm">
+	
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="icon" href="../../austria/ef3782cb63c8a07c725f9b52337c1748.ico">
+
+  	  		  <link rel="stylesheet" href="../../cdn-at/mnxweb63.0.14/static/styles/css/ticketmaster.css">
+	    
+
+	
+	
+    <script src="../../cdn-at/mnxweb63.0.14/static/scripts/library/modernizr-3.2.0-custom.min.js"></script>
+	<!--[if lte IE 9]>
+		<script src="//media.ticketmaster.eu/cdn-at/mnxweb63.0.14/static/scripts/vendor/console-polyfill.js" async></script>
+		<script src="//media.ticketmaster.eu/cdn-at/mnxweb63.0.14/static/scripts/vendor/placeholders.min.js" async></script>
+	<![endif]-->
+    <!--[if lte IE 8]>
+        <script src="//media.ticketmaster.eu/cdn-at/mnxweb63.0.14/static/scripts/vendor/respond.min.js" async></script>
+        <script src="//media.ticketmaster.eu/cdn-at/mnxweb63.0.14/static/scripts/vendor/es5-shim.min.js" type="text/javascript" language="JavaScript"></script>
+        <script src="//media.ticketmaster.eu/cdn-at/mnxweb63.0.14/static/scripts/vendor/es5-sham.min.js" type="text/javascript"></script>
+    <![endif]-->
+
+</head>
+<body class="unbranded ">
+
+<div class="pagecontainer">
+
+		<div id="head" class="headerwrapper">
+	<header class="header">
+		<div class="header__desktop">
+			<div class="toplinks"></div>
+		</div>
+	</header>
+</div>
+
+<script type="application/json" data-store="header">
+	{"header":{"logo":{"pathSVG":"\/\/media.ticketmaster.eu\/austria\/61ff359cda16c98a4c6b41dffdeeef4a.svg","pathPNG":"\/\/media.ticketmaster.eu\/austria\/901e90051a76bef9f096add171d37f73.png","altText":"","logoLink":"\/","displayLink":true},"categories":[{"index":1,"id":10001,"name":"Konzerte","url":"\/category\/konzerte-tickets\/10001","categoryResultsPage":"\/konzerte\/mehr-konzerte\/10001\/events","minor":[{"name":"Alternative & Indie-Rock","id":60,"url":"\/konzerte\/alternative-indie-rock\/60\/events"},{"name":"Dance & Elektro","id":201,"url":"\/konzerte\/dance-elektro\/201\/events"},{"name":"Hardrock & Metal","id":200,"url":"\/konzerte\/hardrock-metal\/200\/events"},{"name":"Hip Hop & R 'n' B","id":3,"url":"\/konzerte\/hip-hop-r-n-b\/3\/events"},{"name":"Rock & Pop","id":1,"url":"\/konzerte\/rock-pop\/1\/events"},{"name":"Schlager & Volksmusik","id":1220,"url":"\/konzerte\/schlager-volksmusik\/1220\/events"}]},{"index":2,"id":10004,"name":"Sport","url":"\/category\/sport-tickets\/10004","categoryResultsPage":"\/sport\/mehr-sport\/10004\/events","minor":[{"name":"American Football","id":8,"url":"\/sport\/american-football\/8\/events"},{"name":"Fussball","id":11,"url":"\/sport\/fussball\/11\/events"},{"name":"Handball","id":1103,"url":"\/sport\/handball\/1103\/events"},{"name":"Motorsport","id":25,"url":"\/sport\/motorsport\/25\/events"},{"name":"Reitsport","id":1227,"url":"\/sport\/reitsport\/1227\/events"}]},{"index":3,"id":10002,"name":"B\u00fchne","url":"\/category\/buhne-tickets\/10002","categoryResultsPage":"\/buhne\/mehr-buhne\/10002\/events","minor":[{"name":"Shows","id":1118,"url":"\/buhne\/shows\/1118\/events"}]},{"index":4,"id":10003,"name":"Freizeit","url":"\/category\/freizeit-tickets\/10003","categoryResultsPage":"\/freizeit\/mehr-freizeit\/10003\/events","minor":[]}],"language":{"languages":[{"link":"?language=de-at","shortDisplayName":"DE","fullDisplayName":"Deutsch","languageCode":"de-at","isCurrentLanguage":true},{"link":"?language=en-us","shortDisplayName":"EN","fullDisplayName":"Englisch","languageCode":"en-us","isCurrentLanguage":false}],"currentLanguage":{"shortDisplayName":"DE","languageCode":"de-at"}},"topLinks":[{"url":"https:\/\/www.ticketmaster.at\/feature\/geschenk-gutschein\/?camefrom=tm-tl-geschenk-gutscheine-2018","name":"Geschenk-Gutscheine"},{"url":"https:\/\/help.ticketmaster.at\/hc\/de-at","name":"H\u00e4ufige Fragen"},{"url":"https:\/\/www.ticketmaster.at\/feature\/collector-ticket","name":"Collector Ticket"},{"url":"https:\/\/www.ticketmaster.at\/feature\/global","name":"Top-Events Weltweit "}],"links":{"logout":"\/logout"},"myAccount":{"profile":{"url":"\/myAccount\/editProfile"},"upcomingEvents":{"url":"\/myAccount\/upcomingEvents"},"pastEvents":{"url":"\/myAccount\/pastEvents"},"address":{"url":"\/myAccount\/editAddress"},"newsletter":{"url":"\/myAccount\/editSubscription"}},"forgotPassword":{"actionFormUrl":"\/resetPassword"},"search":{"searchUrl":"\/search\/?keyword=","languageParameter":"","toggleAutoComplete":"off"},"suggest":{"suggestUrl":"\/search\/suggest\/de-at\/?query=","autoSuggestEnabled":true},"discover":{"categories":[{"id":10001,"name":"Konzerte","minorCategories":[{"id":0,"name":"Alle Konzerte"},{"id":60,"name":"Alternative & Indie-Rock"},{"id":201,"name":"Dance & Elektro"},{"id":200,"name":"Hardrock & Metal"},{"id":3,"name":"Hip Hop & R 'n' B"},{"id":1,"name":"Rock & Pop"},{"id":1220,"name":"Schlager & Volksmusik"}]},{"id":10004,"name":"Sport","minorCategories":[{"id":0,"name":"Alle Sport"},{"id":8,"name":"American Football"},{"id":11,"name":"Fussball"},{"id":1103,"name":"Handball"},{"id":25,"name":"Motorsport"},{"id":1227,"name":"Reitsport"}]},{"id":10002,"name":"B\u00fchne","minorCategories":[{"id":0,"name":"Alle B\u00fchne"},{"id":1118,"name":"Shows"}]},{"id":10003,"name":"Freizeit","minorCategories":[{"id":0,"name":"Alle Freizeit"}]}],"locations":{"cities":[{"name":"Attnang-Puchheim","id":"91925"},{"name":"Bad Tatzmannsdorf","id":"91964"},{"name":"Bregenz","id":"92014"},{"name":"Gm\u00fcnd","id":"92303"},{"name":"Graz","id":"60052"},{"name":"Hard","id":"92455"},{"name":"Innsbruck","id":"72360"},{"name":"Krems an der Donau","id":"92718"},{"name":"Linz","id":"92843"},{"name":"Salzburg","id":"93389"},{"name":"Schwechat","id":"93453"},{"name":"Spielberg","id":"93518"},{"name":"St. P\u00f6lten","id":"93640"},{"name":"Vorchdorf","id":"93886"},{"name":"Wien","id":"91071"},{"name":"Wiener Neustadt","id":"93985"}],"countries":[{"id":"276","name":"Deutschland"},{"id":"246","name":"Finnland"},{"id":"124","name":"Kanada"},{"id":"642","name":"Rum\u00e4nien"},{"id":"756","name":"Schweiz"},{"id":"703","name":"Slowakei"},{"id":"705","name":"Slowenien"},{"id":"724","name":"Spanien"},{"id":"348","name":"Ungarn"},{"id":"826","name":"Vereinigtes K\u00f6nigreich"}],"currentCountry":{"id":"40","name":"\u00d6sterreich"},"defaultLocation":{"id":0,"name":"Alle Orte"}},"dates":{"0":"Alle Zeitr\u00e4ume","2023-08":"August 2023","2023-09":"September 2023","2023-10":"Oktober 2023","2023-11":"November 2023","2023-12":"Dezember 2023","2024-01":"Januar 2024","2024-02":"Februar 2024","2024-03":"M\u00e4rz 2024","2024-04":"April 2024","2024-05":"Mai 2024","2024-06":"Juni 2024","2024-07":"Juli 2024"},"submitUrl":"\/browse-events"},"customNavigationItems":[]}}</script>
+
+	
+	<div class="maincontent--discovery">
+				
+    <div class="staticpage">
+  		<link href="../../austria/feature/presale/bootstrap-grid.min.css" type="text/css" rel="stylesheet">
+<style>
+	/*start header and footer overrides*/
+	.header__desktop {
+		max-width: 100%;
+	}
+
+	.discover,
+	.searchdiscover__tab--discover {
+		display: none;
+	}
+
+	.headerwrapper {
+		min-height: 0;
+	}
+
+	@media only screen and (min-width: 768px) {
+		.headerwrapper {
+			min-height: 125px;
+		}
+	}
+
+	.mainfooter {
+		margin-top: 0 !important;
+		background-color: #262626 !important;
+	}
+
+	.maincontent--discovery {
+		max-width: none !important;
+		width: 100%;
+	}
+
+	.staticpage {
+		max-width: none !important;
+		padding: 0;
+		background-color: #F6F6F6;
+	}
+
+	/*end header and footer overrides*/
+	.staticpage {
+		font-family: "Averta", Arial, sans-serif;
+		color: #262626;
+	}
+
+	.staticpage h1,
+	.staticpage p {
+		margin: 0;
+		padding: 0;
+	}
+
+	.staticpage .wrapper {
+		max-width: 1000px;
+		margin: 0 auto;
+	}
+
+	.staticpage .wrapper.content {
+		padding-bottom: 50px;
+	}
+
+	.staticpage h2 {
+		margin: 0;
+		padding: 30px 0 15px;
+		line-height: 1.2em;
+		font-size: 22px;
+		font-weight: 600;
+	}
+
+	@media (min-width: 992px) {
+		.staticpage h2 {
+			padding: 45px 0 25px;
+			line-height: 1.2em;
+			font-size: 24px;
+		}
+	}
+
+	.staticpage p {
+		padding: 0 0 15px;
+		line-height: 1.4em;
+		font-size: 16px;
+	}
+
+	.staticpage .intro h2 {
+		padding: 30px 0 5px;
+	}
+
+	@media (min-width: 992px) {
+		.staticpage .intro h2 {
+			padding: 45px 0 7px;
+		}
+	}
+
+	.staticpage .intro p {
+		padding: 0 0 20px;
+	}
+
+	@media (min-width: 992px) {
+		.staticpage .intro p {
+			padding: 0 0 30px;
+		}
+	}
+
+	.staticpage ul {
+		margin: 0;
+		padding: 0 0 25px 40px;
+	}
+
+	.staticpage a {
+		font-weight: 600;
+		color: #026CDF;
+		text-decoration: none;
+	}
+
+	.staticpage a:hover,
+	.staticpage a:focus {
+		color: #0150A7;
+		text-decoration: underline;
+	}
+
+	.staticpage .header-row {
+		color: #ffffff;
+		background: #1F262D url("images/presales_bg_2.jpg") top center no-repeat;
+		background-size: cover;
+	}
+
+	.staticpage .header-row .presale-logo {
+		max-width: 210px;
+	}
+
+	.staticpage .header-row h1 {
+		padding: 100px 0 20px;
+	}
+
+	.staticpage .header-row p {
+		padding: 0 0 30px;
+		line-height: 1.4em;
+		font-size: 18px;
+		font-weight: 600;
+	}
+
+	@media (min-width: 992px) {
+		.staticpage .header-row .presale-logo {
+			max-width: 300px;
+		}
+
+		.staticpage .header-row h1 {
+			padding: 210px 0 30px;
+		}
+
+		.staticpage .header-row p {
+			padding: 0 0 50px;
+			line-height: 1.4em;
+			font-size: 20px;
+		}
+	}
+
+	.staticpage .secondary-row {
+		padding: 10px 0;
+		color: #ffffff;
+		/* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#0653a4+49,026cdf+100 */
+		background: #0653a4;
+		/* Old browsers */
+		/* FF3.6-15 */
+		background: -webkit-linear-gradient(left, #0653a4 49%, #026cdf 100%);
+		/* Chrome10-25,Safari5.1-6 */
+		background: linear-gradient(to right, #0653a4 49%, #026cdf 100%);
+		/* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0653a4', endColorstr='#026cdf', GradientType=1);
+		/* IE6-9 */
+	}
+
+	.staticpage .secondary-row p {
+		position: relative;
+		line-height: 1.2em;
+		font-size: 16px;
+		font-weight: 600;
+	}
+
+	.staticpage .secondary-row a {
+		float: left;
+		width: 100%;
+		position: relative;
+		padding-right: 40px;
+		color: #ffffff;
+		text-decoration: none;
+	}
+
+	.staticpage .secondary-row a span {
+		text-decoration: underline;
+	}
+
+	.staticpage .secondary-row a::before {
+		content: '';
+		position: absolute;
+		top: 5px;
+		bottom: 0;
+		right: 0;
+		width: 30px;
+		background: url("images/icon_email.png") no-repeat top center;
+		background-size: 30px 21px;
+	}
+
+	.staticpage .secondary-row a:hover,
+	.staticpage .secondary-row a:focus {
+		text-decoration: underline;
+	}
+
+	@media (min-width: 992px) {
+		.staticpage .secondary-row {
+			padding: 15px 0;
+			/* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#0653a4+31,026cdf+62,00ffff+100 */
+			background: #0653a4;
+			/* Old browsers */
+			/* FF3.6-15 */
+			background: -webkit-linear-gradient(left, #0150A7 31%, #026cdf 62%, #00ffff 100%);
+			/* Chrome10-25,Safari5.1-6 */
+			background: linear-gradient(to right, #0150A7 31%, #026cdf 62%, #00ffff 100%);
+			/* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+			filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0150A7', endColorstr='#00ffff', GradientType=1);
+			/* IE6-9 */
+		}
+
+		.staticpage .secondary-row p {
+			line-height: 1.2em;
+			font-size: 18px;
+		}
+
+		.staticpage .secondary-row a {
+			padding-left: 40px;
+		}
+
+		.staticpage .secondary-row a::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			width: 30px;
+			background: url("images/icon_email.png") no-repeat center center;
+			background-size: 30px 21px;
+			-webkit-transition: all 0.3s;
+			transition: all 0.3s;
+		}
+
+		.staticpage .secondary-row a:hover::before,
+		.staticpage .secondary-row a:focus::before {
+			-webkit-animation: rotate-center 0.6s ease-in-out both;
+			animation: rotate-center 0.6s ease-in-out both;
+		}
+	}
+
+	.staticpage .box-blocks {
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		-ms-flex-wrap: wrap;
+		flex-wrap: wrap;
+	}
+
+	.staticpage .box-blocks>[class*='col-'] {
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		-webkit-box-orient: vertical;
+		-webkit-box-direction: normal;
+		-ms-flex-direction: column;
+		flex-direction: column;
+	}
+
+	.staticpage .box-blocks article {
+		position: relative;
+		height: 100%;
+		margin-bottom: 20px;
+		padding: 0 0 45px;
+		border-radius: 4px;
+		overflow: hidden;
+		background: #ffffff;
+		cursor: pointer;
+		box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 2px 0px;
+		-webkit-transition: box-shadow 0.4s cubic-bezier(0.1, 0.85, 0.25, 1) 0s;
+		transition: box-shadow 0.4s cubic-bezier(0.1, 0.85, 0.25, 1) 0s;
+	}
+
+	.staticpage .box-blocks article p {
+		padding: 0;
+		line-height: 1.2em;
+	}
+
+	.staticpage .box-blocks article a {
+		float: left;
+		width: 100%;
+		font-weight: normal;
+		text-decoration: none;
+	}
+
+	.staticpage .box-blocks article a.ticketfirst {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		padding: 10px 10px;
+		border-top: 1px dotted #BFBFBF;
+		color: #026CDF;
+	}
+
+	.staticpage .box-blocks article a.ticketfirst p {
+		position: relative;
+		padding-left: 25px;
+		font-size: 13px;
+	}
+
+	.staticpage .box-blocks article a.ticketfirst p::before {
+		content: '';
+		position: absolute;
+		top: 1px;
+		bottom: 0;
+		left: 0;
+		width: 18px;
+		background: url("images/icon_ticketfirst.png") no-repeat top center;
+		background-size: 18px 13px;
+	}
+
+	.staticpage .box-blocks article a.ticketfirst:hover p {
+		text-decoration: underline;
+	}
+
+	.staticpage .box-blocks article a.details {
+		padding-bottom: 45px;
+	}
+
+	.staticpage .box-blocks article h3 {
+		margin: 0;
+		padding: 10px 10px 5px;
+		line-height: 1.2em;
+		font-size: 18px;
+		font-weight: 600;
+		color: #262626;
+	}
+
+	.staticpage .box-blocks article h3 span {
+		padding-left: 3px;
+		font-size: 13px;
+		font-weight: normal;
+		color: #962D94;
+	}
+
+	@media (min-width: 992px) {
+		.staticpage .box-blocks article h3 {
+			font-size: 16px;
+		}
+	}
+
+	.staticpage .box-blocks article .location {
+		padding: 0px 10px 5px;
+		line-height: 1.4em;
+		font-size: 14px;
+		color: #646464;
+	}
+
+	.staticpage .box-blocks article .state {
+		position: absolute;
+		right: 0;
+		bottom: 45px;
+		left: 0;
+		padding: 5px 10px;
+	}
+
+	.staticpage .box-blocks article .state p {
+		float: left;
+		padding: 3px 7px;
+		font-size: 14px;
+		font-weight: 600;
+		border: 1px solid #962D94;
+		background: #962D94;
+		color: #ffffff;
+	}
+
+	@media (min-width: 992px) {
+		.staticpage .box-blocks article .state p {
+			font-size: 13px;
+		}
+	}
+
+	.staticpage .box-blocks article.open h3 span {
+		display: none;
+	}
+
+	.staticpage .box-blocks article.open .state p {
+		background: #ffffff;
+		color: #962D94;
+	}
+
+	.staticpage .box-blocks article:hover {
+		box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 2px 2px;
+	}
+
+	@media (min-width: 768px) {
+		.staticpage .box-blocks .col-md-12 article {
+			padding-bottom: 0;
+		}
+
+		.staticpage .box-blocks .col-md-12 article .details {
+			padding-bottom: 0;
+		}
+
+		.staticpage .box-blocks .col-md-12 article .image {
+			float: left;
+			width: 66%;
+		}
+
+		.staticpage .box-blocks .col-md-12 article h3,
+		.staticpage .box-blocks .col-md-12 article .location {
+			float: left;
+			width: 34%;
+		}
+
+		.staticpage .box-blocks .col-md-12 article h3 {
+			padding: 30px 10px 5px;
+			font-size: 20px;
+		}
+
+		.staticpage .box-blocks .col-md-12 article .location {
+			padding: 0 10px 10px;
+			font-size: 16px;
+		}
+
+		.staticpage .box-blocks .col-md-12 article .state {
+			left: auto;
+			right: 0;
+			width: 34%;
+			padding-bottom: 30px;
+		}
+
+		.staticpage .box-blocks .col-md-12 article .state p {
+			font-size: 14px;
+			padding: 5px 15px;
+		}
+
+		.staticpage .box-blocks .col-md-12 article a.ticketfirst {
+			left: auto;
+			right: 0;
+			width: 34%;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.staticpage .box-blocks article .image {
+			position: relative;
+		}
+
+		.staticpage .box-blocks article .image .image-overlay {
+			opacity: 0;
+			position: absolute;
+			top: 0px;
+			right: 0px;
+			bottom: 0px;
+			left: 0;
+			background: #026CDF;
+			-webkit-transition: opacity 0.4s cubic-bezier(0.1, 0.85, 0.25, 1) 0s;
+			transition: opacity 0.4s cubic-bezier(0.1, 0.85, 0.25, 1) 0s;
+		}
+
+		.staticpage .box-blocks article .image::after {
+			content: "";
+			position: absolute;
+			display: block;
+			top: 0px;
+			right: 0px;
+			bottom: 0px;
+			width: 30px;
+			background: #026CDF url("images/icon_chevron.png") no-repeat center center;
+			background-size: 6px 11px;
+			opacity: 0;
+			-webkit-transition: opacity 0.4s cubic-bezier(0.1, 0.85, 0.25, 1) 0s;
+			transition: opacity 0.4s cubic-bezier(0.1, 0.85, 0.25, 1) 0s;
+		}
+
+		.staticpage .box-blocks article:hover .image .image-overlay {
+			opacity: 0.3;
+		}
+
+		.staticpage .box-blocks article:hover .image::after {
+			opacity: 1;
+		}
+
+		.staticpage .box-blocks .col-lg-6 article a.details {
+			padding-bottom: 5px;
+		}
+
+		.staticpage .box-blocks .col-lg-6 article h3 {
+			height: 65px;
+			font-size: 20px;
+		}
+
+		.staticpage .box-blocks .col-lg-6 article .location {
+			padding-right: 125px;
+		}
+
+		.staticpage .box-blocks .col-lg-6 article .state {
+			right: 0;
+			padding: 5px 10px 7px;
+		}
+
+		.staticpage .box-blocks .col-lg-6 article .state p {
+			float: right;
+			font-size: 14px;
+		}
+
+		.staticpage .box-blocks .col-lg-6 article.open .location {
+			padding-right: 240px;
+		}
+
+		.staticpage .box-blocks .col-lg-3 article a.ticketfirst p {
+			font-size: 11px;
+		}
+
+		.staticpage .box-blocks .col-lg-3 article a.ticketfirst p::before {
+			top: 0;
+		}
+	}
+
+	.staticpage .box-blocks-discover article {
+		padding-bottom: 0;
+	}
+
+	.staticpage .box-blocks-past {
+		pointer-events: none;
+	}
+
+	.staticpage .box-blocks-past article {
+		padding-bottom: 0;
+	}
+
+	.staticpage .box-blocks-past article a.details {
+		padding-bottom: 7px;
+	}
+
+	.staticpage .box-blocks-past article h3 span,
+	.staticpage .box-blocks-past .location,
+	.staticpage .box-blocks-past .state,
+	.staticpage .box-blocks-past a.ticketfirst {
+		display: none;
+	}
+
+	/* ----------------------------------------------
+	 * Generated by Animista on 2019-8-20 16:43:42
+	 * w: http://animista.net, t: @cssanimista
+	 * ---------------------------------------------- */
+	/**
+	 * ----------------------------------------
+	 * animation rotate-center
+	 * ----------------------------------------
+	 */
+	@-webkit-keyframes rotate-center {
+		0% {
+			-webkit-transform: rotate(0);
+			transform: rotate(0);
+		}
+
+		100% {
+			-webkit-transform: rotate(360deg);
+			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes rotate-center {
+		0% {
+			-webkit-transform: rotate(0);
+			transform: rotate(0);
+		}
+
+		100% {
+			-webkit-transform: rotate(360deg);
+			transform: rotate(360deg);
+		}
+	}
+</style>
+
+
+
+<div class="header-row">
+	<div class="wrapper">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-12 col-lg-12">
+					<h1><img src="../../austria/feature/presale/images/ticketmasterpresale_logo.png" alt="Ticketmaster Presale" class="presale-logo">
+					</h1>
+					<p>Ab sofort bekommst du deine Tickets für die angesagtesten Konzerte und Live-Events in Österreich
+						hier im Ticketmaster Presale vor dem offiziellen Vorverkauf. Lege dir jetzt kostenlos einen
+						Ticketmaster-Account an – schon kannst du dir deine Tickets vor allen anderen Fans im Presale
+						sichern.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="secondary-row">
+	<div class="wrapper">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-12 col-lg-12">
+					<p><a href="https://www.ticketmaster.at/feature/newsletter" target="_blank"><span>Klick
+								hier</span>, logg dich ein und erhalte alle Presale-News im Newsletter!</a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="wrapper content">
+
+	<div class="container-fluid">
+<!-- NEWSLETTER STRIP end-->
+<div class="wrapper content">
+	<div class="container-fluid">
+		<!-- FEATURED PRESALES start-->
+	
+		<!--HEADER start-->
+		<div class="row">
+			<div class="col-xs-12 col-lg-12 intro">
+				<h2>Aktuelle Presales</h2>
+				<p>Entdecke Tourneen, Konzerte und andere Events in Österreich, für die es zurzeit Presale-Tickets bei
+					Ticketmaster gibt oder kürzlich gab. Sichere dir deine Tickets bevor der offizielle Vorverkauf
+					beginnt! Alles, was du benötigst, ist ein Account bei Ticketmaster Österreich.</p>
+			</div>
+		</div>
+		<!--HEADER end-->
+
+<!-- EVENT BLOCKS start-->
+  <div class="row box-blocks">
+
+  
+
+  
+
+  <div class="col-xs-12 col-md-6 col-lg-6">
+		<article>
+			<a href="../../artist/lenalinus-tickets/1178243.html" class="details">
+				<div class="image">
+					<img src="../../austria/feature/presale/images/lena-linus-2023-tour-720x405.jpg" alt="Lena&Linus">
+					<div class="image-overlay"></div>
+				</div>
+				<h3>Lena&Linus <span>Presale läuft</span>
+				</h3>
+				<p class="location">Wien</p>
+			</a>
+			<a href="../../artist/lenalinus-tickets/1178243.html" class="state">
+				<p>Jetzt Presale-Tickets sichern</p>
+				<!--	<a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+			</a>
+			
+		</article>
+	</div>
+
+
+
+
+
+	<!-- THREE EVENTS ROW start-->
+		</div>
+		<!-- EVENT BLOCKS end-->
+
+
+		<!--TEXT start-->
+		<div class="row">
+			<div class="col-xs-12 col-lg-12">
+				<p><br><strong>Wann gibt es die ersten Tickets?</strong></p>
+				<p>
+					Hin und wieder kommt es vor, dass es mehrere Presale-Phasen gibt. So kann es zum Beispiel einen
+					Album-Presale geben, für den du einen Code benötigst, der an alle Album-Vorbesteller verschickt
+					wurde. Welche Presales es gibt und was du dafür tun musst, um deine Tickets vor allen anderen zu
+					bekommen, erfährst du auf der jeweiligen Künstler*innen-Seite. Diese Ticketmaster Presales hast du
+					kürzlich verpasst:
+				</p>
+			</div>
+		</div>
+		<!--TEXT end-->
+
+		<!-- EVENT BLOCKS start-->
+		<div class="row box-blocks">
+
+
+		<div class="row box-blocks">
+
+            <div class="col-xs-12 col-md-6 col-lg-4">
+                <article>
+                    <a href="../../artist/jonas-brothers-tickets/33380.html" class="details">
+                        <div class="image">
+                            <img src="../../austria/feature/presale/images/Jonas-Brothers-2024-720x405.jpg" alt="Jonas Brothers">
+                            <div class="image-overlay"></div>
+                        </div>
+                        <h3>Jonas Brothers <span>Presale beendet</span>
+                        </h3>
+                        <p class="location">Wien</p>
+                    </a>
+                    <a href="../../artist/jonas-brothers-tickets/33380.html" class="state">
+                        <p>Jetzt im regulären Vorverkauf</p>
+                        <!--	<a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+                    </a>
+                    
+                </article>
+            </div>
+
+            <div class="col-xs-12 col-md-6 col-lg-4">
+                <article>
+                    <a href="https://www.ticketmaster.at/artist/coldplay-tickets/10139?camefrom=coldplay-presale" class="details">
+                        <div class="image">
+                            <img src="../../austria/feature/presale/images/coldplay-2023-dhl-720x405.jpg" alt="Coldplay">
+                            <div class="image-overlay"></div>
+                        </div>
+                        <h3>Coldplay <span>Presale beendet</span>
+                        </h3>
+                        <p class="location"> Music Of The Spheres World Tour - Delivered by DHL</p>
+                    </a>
+                    <a href="https://www.ticketmaster.at/artist/coldplay-tickets/10139?camefrom=coldplay-presale" class="state">
+                        <p>Jetzt im regulären Vorverkauf</p>
+                        <!--	<a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+                    </a>
+                    
+                </article>
+            </div>
+
+
+            <div class="col-xs-12 col-md-6 col-lg-4">
+                <article>
+                    <a href="../../artist/shirin-david-tickets/1017588.html" class="details">
+                        <div class="image">
+                            <img src="../../austria/feature/presale/images/shirin-david-presale-tickets.jpg" alt="Shirin David Presale">
+                            <div class="image-overlay"></div>
+                        </div>
+                        <h3>Shirin David<span>Presale beendet</span>
+                        </h3>
+                        <p class="location">Arena-Konzerte in Deutschland + Österreich | November 2023</p>
+                    </a>
+                    <a href="../../artist/shirin-david-tickets/1017588.html" class="state">
+                        <p>Jetzt im regulären Vorverkauf</p>
+                        <!-- <a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+                    </a>
+                    
+                </article>
+            </div>
+
+
+			<div class="col-xs-12 col-md-6 col-lg-4">
+				<article>
+					<a href="../../artist/marco-mengoni-tickets/969883.html" class="details">
+						<div class="image">
+							<img src="../../austria/feature/presale/images/marco-mengoni-2023-720x405.jpg" alt="Marco Mengoni Presale">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>Marco Mengoni<span>Presale beendet</span>
+						</h3>
+						<p class="location">Wien | Herbst 2023</p>
+					</a>
+					<a href="../../artist/marco-mengoni-tickets/969883.html" class="state">
+						<p>Jetzt im regulären Vorverkauf</p>
+						<!-- <a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+					</a>
+					
+				</article>
+			</div>
+		
+		<div class="col-xs-12 col-md-6 col-lg-4">
+				<article>
+					<a href="../../artist/lil-yachty-tickets/973468.html" class="details">
+						<div class="image">
+							<img src="../../austria/feature/presale/images/lil-yachty-2023-720x405.jpg" alt="Lil Yachty Presale">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>Lil Yachty<span>Presale beendet</span>
+						</h3>
+						<p class="location">The Field Trip Tour 2023 | Wien</p>
+					</a>
+					<a href="../../artist/lil-yachty-tickets/973468.html" class="state">
+						<p>Jetzt im regulären Vorverkauf</p>
+						<!-- <a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+					</a>
+					
+				</article>
+			</div>
+
+			<div class="col-xs-12 col-md-6 col-lg-4">
+				<article>
+					<a href="../../artist/depeche-mode-tickets/73.html" class="details">
+						<div class="image"><img src="../../austria/feature/presale/images/Depeche-Mode_Spotlight_720x405.jpg" alt="Bruce Springsteen Österreich">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>Depeche Mode
+							<span>Presale beendet</span></h3>
+						<p class="location">Memento Mori Tour 2023</p>
+					</a>
+					<a href="../../artist/depeche-mode-tickets/73.html" class="state">
+						<p>Jetzt im regulären Vorverkauf</p>
+					</a>
+				</article>
+			</div>
+
+<div class="col-xs-12 col-md-6 col-lg-4">
+				<article>
+					<a href="../../artist/sting-tickets/2196.html" class="details">
+						<div class="image">
+							<img src="../../austria/feature/presale/images/sting-720.jpg" alt=" Sting">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>Sting
+							<span>Presale beendet</span>
+						</h3>
+						<p class="location"> Open-Air-Tour 2023</p>
+					</a>
+					<a href="../../artist/sting-tickets/2196.html" class="state">
+						<p>Jetzt im regulären Vorverkauf</p>
+						<!-- <a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+					</a>
+					
+				</article>
+			</div>
+
+<div class="col-xs-12 col-md-6 col-lg-4">
+				<article>
+					<a href="../../artist/luvre47-tickets/1227544.html" class="details">
+						<div class="image">
+							<img src="../../austria/feature/presale/images/luvre-47-720x405.jpeg" alt="Luvre Presale">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>LUVRE47
+							<span>Presale beendet</span>
+						</h3>
+						<p class="location">Wien | November 2023</p>
+					</a>
+					<a href="../../artist/luvre47-tickets/1227544.html" class="state">
+						<p>Jetzt im regulären Vorverkauf</p>
+						<!-- <a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+					</a>
+					
+				</article>
+			</div>
+
+
+			<div class="col-xs-12 col-md-6 col-lg-4">
+				<article>
+					<a href="../../artist/mayberg-tickets/1139584.html" class="details">
+						<div class="image">
+							<img src="../../austria/feature/presale/images/Mayberg720x405.jpg" alt="Mayberg">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>Mayberg<span>Presale beendet </span>
+						</h3>
+						<p class="location">Wien | April 2023</p>
+					</a>
+					<a href="../../artist/mayberg-tickets/1139584.html" class="state">
+						<p>Jetzt im regulären Vorverkauf</p>
+						<!-- <a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+					</a>
+					
+				</article>
+			</div>
+
+
+			<div class="col-xs-12 col-md-6 col-lg-4">
+				<article>
+					<a href="../../artist/blink-182-tickets/3832.html" class="details">
+						<div class="image"><img src="../../austria/feature/presale/images/BLINK182-720x405.jpg" alt="blink-182">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>blink-182
+							<span>Presale beendet </span></h3>
+						<p class="location">Wien | September 2023</p>
+					</a>
+					<a href="../../artist/blink-182-tickets/3832.html" class="state">
+						<p>Jetzt im regulären Vorverkauf</p>
+					</a>
+				</article>
+			</div>
+
+			
+
+
+
+
+
+
+
+
+
+			<div class="col-xs-12 col-md-6 col-lg-4">
+				<article>
+					<a href="../../artist/helene-fischer-tickets/872854.html" class="details">
+						<div class="image">
+							<img src="../../austria/feature/presale/images/Helene-Fischer-neu-720x405.jpg" alt="Helene Fischer Presale">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>Helene Fischer<span>Presale beendet</span>
+						</h3>
+						<p class="location">Wien | September 2023</p>
+					</a>
+					<a href="../../artist/helene-fischer-tickets/872854.html" class="state">
+
+
+						<p>Jetzt im regulären Vorverkauf</p>
+						<!--	<a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+					</a>
+					
+				</article>
+			</div>
+
+			<div class="col-xs-12 col-md-6 col-lg-4">
+				<article>
+					<a href="../../artist/bruce-springsteen-the-e-street-band-tickets/5462.html" class="details">
+						<div class="image"><img src="../../austria/feature/presale/images/bruce-springsteen-2023-720x405.jpg" alt="Bruce Springsteen Österreich">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>Bruce Springsteen<span>Presale beendet</span></h3>
+						<p class="location">Wien | Ernst-Happel-Stadion 2023</p>
+					</a>
+					<a href="../../artist/bruce-springsteen-the-e-street-band-tickets/5462.html" class="state">
+						<p>Jetzt im regulären Vorverkauf</p>
+					</a>
+				</article>
+			</div>
+
+			<div class="col-xs-12 col-md-6 col-lg-4">
+				<article>
+					<a href="../../artist/harry-styles-tickets/984352.html" class="details">
+						<div class="image"><img src="../../austria/feature/presale/images/harry-styles-720x405.jpg" alt="Volbeat Presale Österreich">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>Harry Styles <span> Presale beendet </span></h3>
+						<p class="location">Love On Tour 2023 | Wien</p>
+					</a>
+					<a href="../../artist/harry-styles-tickets/984352.html" class="state">
+						<p>Jetzt im regulären Vorverkauf </p>
+					</a>
+				</article>
+			</div>
+
+
+			<div class="col-xs-12 col-md-6 col-lg-4">
+				<article>
+					<a href="../../artist/clockclock-tickets/1203824.html" class="details">
+						<div class="image"><img src="../../austria/feature/presale/images/clockclock-2022-720x405.jpg" alt="Presale Österreich">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>ClockClock <span> Presale beendet</span></h3>
+						<p class="location"> Wien | April 2023</p>
+					</a>
+					<a href="../../artist/clockclock-tickets/1203824.html" class="state">
+						<p>Jetzt im regulären Vorverkauf</p>
+					</a>
+				</article>
+			</div>
+			
+		</div>
+
+
+
+		<!-- THREE EVENTS ROW start-->
+		<!-- EVENT BLOCKS end-->
+
+
+
+		<!--DISCOVER start-->
+		<div class="row">
+			<div class="col-xs-12 col-lg-12">
+				<h2>Entdecken</h2>
+			</div>
+		</div>
+
+		<div class="row box-blocks box-blocks-discover">
+
+			<div class="col-xs-12 col-md-6 col-lg-6">
+				<article>
+					<a href="https://backstage.ticketmaster.at/">
+						<div class="image"><img src="../../austria/feature/presale/images/backstage.jpg" alt="Backstage bei Ticketmaster - So funktioniert Ticketing">
+							<div class="image-overlay"></div>
+						</div>
+					</a>
+				</article>
+			</div>
+
+			<div class="col-xs-12 col-md-6 col-lg-6">
+				<article>
+					<a href="https://blog.ticketmaster.at/">
+						<div class="image"><img src="../../austria/feature/presale/images/blog.jpg" alt="Ticketmaster Blog">
+							<div class="image-overlay"></div>
+						</div>
+					</a>
+				</article>
+			</div>
+		</div>
+		<!--DISCOVER end-->
+
+
+		<!--PAST PRESALES start-->
+		<!--HEADER start-->
+		<div class="row">
+			<div class="col-xs-12 col-lg-12 intro">
+				<h2>Jetzt im regulären Vorverkauf</h2>
+				<p>Leider verpasst! Hier findest du eine Übersicht vergangener Ticketmaster Presales für viele Events,
+					Tourneen und Konzerte in Österreich:</p>
+			</div>
+		</div>
+		<!--HEADER end-->
+
+		<div class="row box-blocks box-blocks-past">
+
+
+
+    <div class="col-xs-12 col-md-6 col-lg-3">
+		<article>
+			<a href="../../artist/emir-taha-tickets/1139453.html" class="details">
+				<div class="image">
+					<img src="../../austria/feature/presale/images/Emir-Taha-720x405.jpg" alt="Emir Taha">
+					<div class="image-overlay"></div>
+				</div>
+				<h3>Emir Taha <span>Presale beendet</span>
+				</h3>
+				<p class="location">Wien</p>
+			</a>
+			<a href="../../artist/emir-taha-tickets/1139453.html" class="state">
+				<p>Jetzt im regulären Vorverkauf</p>
+				<!--	<a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+			</a>
+			
+		</article>
+	</div>
+
+
+
+			<div class="col-xs-12 col-md-6 col-lg-3">
+				<article>
+					<a href="../../artist/namika-tickets/964728.html" class="details">
+						<div class="image"><img src="../../austria/feature/presale/images/Namika720x405.jpg" alt="Presale Österreich">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>Namika <span> Presale beendet</span></h3>
+						<p class="location"> Wien</p>
+					</a>
+					<a href="../../artist/namika-tickets/964728.html" class="state">
+						<p>Jetzt im regulären Vorverkauf</p>
+					</a>
+				</article>
+			</div>
+
+		   <div class="col-xs-12 col-md-6 col-lg-3">
+  <article>
+	<a href="../../artist/he-ro-tickets/1143423.html" class="details">
+	  <div class="image">
+		<img src="../../austria/feature/presale/images/he-ro.jpg" alt="Lochis Konzert Österreich">
+		<div class="image-overlay"></div>
+	  </div>
+	  <h3>HE/RO<span>Presale beendet </span>
+	  </h3>
+	  <p class="location">Wien | Januar 2023</p>
+	</a>
+	<a href="../../artist/he-ro-tickets/1143423.html" class="state">
+	  <p>Jetzt im regulären Vorverkauf</p>
+	  <!--	<a target="_blank" href="" class="ticketfirst"><p>ticketFIRST Newsletter abonnieren</p>-->
+	</a>
+	
+  </article>
+</div>
+
+
+			<div class="col-xs-12 col-md-6 col-lg-3">
+				<article>
+					<a href="../../artist/cashmo-tickets/1187994.html" class="details">
+						<div class="image"><img src="../../austria/feature/presale/images/cashmo-2022-720x405.jpg" alt="Cashmo Presale">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>CASHMO<span>Presale beendet</span></h3>
+						<p class="location">Wien</p>
+					</a>
+					<a href="../../artist/cashmo-tickets/1187994.html" class="state">
+						<p>Tickets</p>
+					</a>
+					<a href="ticketfirst.html" class="ticketfirst">
+						<p>Jetzt im regulären Vorverkauf</p>
+					</a>
+				</article>
+			</div>
+
+
+			<div class="col-xs-12 col-md-6 col-lg-3">
+				<article>
+					<a href="../../artist/beatenberg-tickets/1018920.html" class="details">
+						<div class="image"><img src="../../austria/feature/presale/images/Beatenberg720x405.jpg" alt="Presale Österreich">
+							<div class="image-overlay"></div>
+						</div>
+						<h3>Beatenberg <span> Presale beendet</span></h3>
+						<p class="location"> Wien</p>
+					</a>
+					<a href="../../artist/beatenberg-tickets/1018920.html" class="state">
+						<p>Jetzt im regulären Vorverkauf </p>
+					</a>
+				</article>
+			</div>
+
+
+		</div>
+
+
+		<!--PAST PRESALES end-->
+
+
+
+		<!--TEXT start-->
+		<div class="row">
+			<div class="col-xs-12 col-lg-12">
+				<h2>VIP Tickets, Collector Tickets & SouvenirTickets</h2>
+				<p>Für einige Events gibt es besondere VIP-Pakete, mit denen du verschiedene Vorteile genießt:</p>
+				<ul>
+					<li>All In Packages</li>
+					<li>Early Entry Packages</li>
+					<li>Premium Tickets uvm.</li>
+				</ul>
+				<p>Du bist ein echter Fan und möchtest auch das Ticket im Band- bzw. Tour-Design? Dann halte nach den
+					SouvenirTickets Ausschau. Im Bestellprozess kannst du sehen, ob es für die jeweilige Tour ein
+					SouvenirTicket gibt.
+				</p>
+				<p>Um auch nach dem Event eine bleibende Erinnerung zu haben, bieten wir dir außerdem häufig
+					<b>Collector Tickets</b> an. Das Ticket kommt in Form einer stabilen Plastikkarte mit Lanyard und
+					ist ein limitiertes Sammlerstück. Außerdem sind unsere Collector Tickets ein echter Hingucker. Damit
+					hast du eine Erinnerung für das ganze Leben.
+				</p>
+			</div>
+		</div>
+		<!--TEXT end-->
+
+	</div>
+</div>    </div>
+	</div>
+
+	<div id="omnitureMod"></div>
+
+	<footer id="footer" class="mainfooter" data-component="mainfooter">
+
+    <div class="mainfooter__content">
+
+        
+		
+        <div class="mainfooter__column--internallinks" data-component="mainfooter-internal-links">
+            <input type="checkbox" id="footerTMLinksColumns" class="mainfooter__checkbox">
+            <label for="footerTMLinksColumns" class="mainfooter__column__header" data-action="toggletrigger">
+            	Ticketmaster Links            </label>
+            <div class="mainfooter__column__content" data-action="toggletarget">
+                                    <ul class="mainfooter__links">
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.ticketmaster.at/help/terms.html?tm_link=tm_i_1">
+                        AGB                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://privacy.ticketmaster.at/de/privacy-policy">
+                        Datenschutzerklärung                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.ticketmaster.at/help/ticket_insurance.html?tm_link=tm_i_2">
+                        Ticketversicherung                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.ticketmaster.at/help/imprint.html?tm_link=tm_i_3">
+                        Impressum                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.ticketmaster.at/myAccount/login.php?tm_link=tm_i_4">
+                        Mein Konto                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href=" ?tm_link=tm_i_5">
+                                         </a>
+        </li>
+        </ul>
+
+
+                                    <ul class="mainfooter__links">
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.ticketmaster.at/help/customerservices.html?tm_link=tm_i_6">
+                        Kundenservice                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://help.ticketmaster.at/hc/de-at">
+                        Häufige Fragen                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.ticketmaster.at/help/payment.html?tm_link=tm_i_7">
+                        Zahlungsarten                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.ticketmaster.at/help/delivery.html?tm_link=tm_i_8">
+                        Versandarten                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.ticketmaster.at/help/cancelations.html?tm_link=tm_i_9">
+                        Absagen & Verlegungen                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://help.ticketmaster.at/hc/de-at/articles/360006623153-Wie-erhalte-ich-Karten-f%C3%BCr-Rollstuhlfahrer-und-deren-Begleitung">
+                        Rollstuhlfahrertickets                </a>
+        </li>
+        </ul>
+
+
+                                    <ul class="mainfooter__links">
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.ticketmaster.at/feature/app/?camefrom=tm-tl-apps-2017&tm_link=tm_i_10">
+                        Apps                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href=" https://www.ticketmaster.at/newsletter?tm_link=tm_i_11">
+                        Newsletter                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.facebook.com/Ticketmaster.Austria">
+                        Facebook                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://twitter.com/TicketmasterAT">
+                        Twitter                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.instagram.com/ticketmasterat/">
+                        Instagram                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href=" ?tm_link=tm_i_12">
+                                         </a>
+        </li>
+        </ul>
+
+
+                                    <ul class="mainfooter__links">
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://business.ticketmaster.at/">
+                        B2B Service                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.ticketmaster.at/help/outlets.html?tm_link=tm_i_13">
+                        Vorverkaufsstellen-Service                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://www.ticketmaster.at/feature/affiliates/?camefrom=tm-ilf-affiliates-2017&tm_link=tm_i_14">
+                        Affiliate-Programm                 </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="http://design.ticketmaster.com/">
+                        Logo & Style Guide                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://musicals.ticketmaster.de?camefrom=tmat_ilf_musicals">
+                        Musical-Tickets                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_top" href="https://privacy.ticketmaster.at/de/cookie-policy">
+                        Cookie-Richtlinie                </a>
+        </li>
+        </ul>
+
+
+                            </div>
+        </div>
+
+		
+		
+        <div class="mainfooter__column--externallinks" data-component="mainfooter-external-links">
+            <input type="checkbox" id="footerPartnerLinksColumns" class="mainfooter__checkbox">
+            <label for="footerPartnerLinksColumns" class="mainfooter__column__header" data-action="toggletrigger">
+            	Partner Websites            </label>
+            <div class="mainfooter__column__content" data-action="toggletarget">
+                                    <ul class="mainfooter__links">
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_blank" href="https://www.livenation.de/" rel="nofollow">
+                        Live Nation                </a>
+        </li>
+                <li class="mainfooter__links__item">
+                <a class="mainfooter__links__link" target="_blank" href="../universe/index.htm">
+                        Universe                </a>
+        </li>
+        </ul>
+
+
+                            </div>
+        </div>
+
+		
+        
+    </div>
+
+    	<div class="mainfooter__smallprint">
+		<p class="mainfooter__smallprint__item" data-component="mainfooter-smallprint-copyright">© Ticketmaster 2022</p>
+		<p class="mainfooter__smallprint__item" data-component="mainfooter-smallprint-address"></p>
+		<p class="mainfooter__smallprint__item" data-component="mainfooter-smallprint-disclaimer"></p>
+        <p class="mainfooter__smallprint__item" data-component="mainfooter-smallprint-disclaimer">
+            <span class="ot-sdk-show-settings">Cookies verwalten</span>
+            <span class="e-two ot-link" onclick="showCookieConsent()">Cookies verwalten</span>
+        </p>
+	</div>
+
+	<script>
+        function showCookieConsent() {
+            if (window.OneTrust) {
+                window.OneTrust.ToggleInfoDisplay();
+            }
+        }
+	</script>
+</footer>
+
+<style>
+	.evidon-notice-link {
+		cursor: pointer;
+	}
+</style>
+<script>
+	// Polyfill https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove
+    (function (arr) {
+        arr.forEach(function (item) {
+            if (item.hasOwnProperty('remove')) {
+                return;
+            }
+            Object.defineProperty(item, 'remove', {
+                configurable: true,
+                enumerable: true,
+                writable: true,
+                value: function remove() {
+                    if (this.parentNode !== null)
+                        this.parentNode.removeChild(this);
+                }
+            });
+        });
+    })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+
+    function mfolOnDOMContentLoaded() {
+
+        var footerColumn = document.querySelector('.mainfooter__column--internallinks .mainfooter__links:last-of-type');
+        var cookieText;
+
+        try {
+            cookieText = JSON.parse(document.querySelector("script[data-store='translations']").textContent).footerModule['MANAGE_MY_COOKIES'];
+        }
+        catch(error) {
+            cookieText = 'Cookie Consent';
+        }
+
+        var oneTrustSpan = document.createElement("span");
+        oneTrustSpan.setAttribute("class", "ot-sdk-show-settings");
+
+        var span = document.createElement("span");
+        span.setAttribute("class", "mainfooter__links__link ot-link");
+        span.textContent = cookieText;
+        span.addEventListener("click", showCookieConsent);
+
+        var li = document.createElement("li");
+        li.setAttribute("class", "mainfooter__links__item");
+
+        li.appendChild(oneTrustSpan)
+        li.appendChild(span);
+        footerColumn.appendChild(li);
+
+        var mmcSpan = document.getElementById('mmc-span');
+        var discardableSpan = document.getElementById('mmc-span-discardable');
+
+        var targetNode;
+
+        if (!!mmcSpan && !!discardableSpan) {   // true true
+            discardableSpan.remove();
+            targetNode = mmcSpan;
+        }
+
+        if (!!mmcSpan && !discardableSpan) {    // true false
+            targetNode = mmcSpan;
+        }
+
+        if (!mmcSpan && !discardableSpan) {    // false false
+            return;
+        }
+
+        if (!MutationObserver) { // IE < 9 fallback
+            (function () {
+                var done = false;
+
+                function obscureMsg() {
+                    if (done) {
+
+                        return;
+                    }
+
+                    var evidonLink = document.getElementById('_evh-link');
+                    if (evidonLink) {
+                        evidonLink.setAttribute("style", "display: none;");
+                        done = true;
+                    }
+
+                    setTimeout(obscureMsg, 50);
+                }
+
+                setTimeout(obscureMsg, 50);
+            })();
+
+            return;
+        }
+
+        var observer = new MutationObserver(callback);
+        var config = { childList: true };
+
+        observer.observe(targetNode, config);
+
+        function callback(mutationsList) {
+			var length = Object.keys(mutationsList).length;
+
+			for(var i = 0; i < length; i++) {
+				var mutation = mutationsList[i.toString()];
+				// console.log(mutation);
+
+				if (mutation.type === 'childList') {
+					// console.log(mutation);
+
+					var evidonLink = document.getElementById('_evh-link');
+					if (evidonLink) {
+						evidonLink.setAttribute("style", "display: none;");
+						observer.disconnect();
+					}
+				}
+			}
+		}
+
+    }
+
+    document.addEventListener("DOMContentLoaded", mfolOnDOMContentLoaded);
+
+    function showCookieConsent() {
+        if (window.OneTrust) {
+            window.OneTrust.ToggleInfoDisplay();
+        }
+    }
+</script>
+</div>
+
+<script type="application/json" data-store="translations">{"pageTranslations":[],"headerModule":{"MENU":"Men\u00fc","CLOSE":"Schlie\u00dfen","MY_ACCOUNT_WELCOME_BACK":"Willkommen zur\u00fcck","LOCATION":"Einstellungen","YOUR_ACCOUNT":"Konto"},"footerModule":{"MANAGE_MY_COOKIES":"Cookies verwalten"},"categoryNavigationModule":{"MORE":"Mehr","BROWSE_CATEGORIES":"KATEGORIEN DURCHSUCHEN","CATEGORIES":"Kategorien","CLOSE_BUTTON":"Schlie\u00dfen","BROWSE_BY_CATEGORY_PROMPT":"Oder ein Genre ausw\u00e4hlen","FIND_BY_CATEGORY_PROMPT_10001":"Veranstaltungen in Konzerte finden","SEE_ALL_BY_CATEGORY_10001":"Alle Veranstaltungen in Konzerte anzeigen","FIND_BY_CATEGORY_PROMPT_10004":"Veranstaltungen in Sport finden","SEE_ALL_BY_CATEGORY_10004":"Alle Veranstaltungen in Sport anzeigen","FIND_BY_CATEGORY_PROMPT_10002":"Veranstaltungen in B\u00fchne finden","SEE_ALL_BY_CATEGORY_10002":"Alle Veranstaltungen in B\u00fchne anzeigen","FIND_BY_CATEGORY_PROMPT_10003":"Veranstaltungen in Freizeit finden","SEE_ALL_BY_CATEGORY_10003":"Alle Veranstaltungen in Freizeit anzeigen"},"languageModule":{"SELECT_LANGUAGE":"Sprache ausw\u00e4hlen","LANGUAGE":"Sprache"},"topLinksModule":{"WELCOME":"Herzlich Willkommen %FIRSTNAME%","HEADER_LOGIN_BUTTON":"Einloggen","LOG_OUT":"Ausloggen"},"myAccountModule":{"MY_ACCOUNT":"Mein Konto","ACCOUNT":"Konto","EDIT_PROFILE":"Profil editieren","EDIT_PROFILE_DESC":"Hier k\u00f6nnen Sie Ihre pers\u00f6nlichen Daten, Ihre E-Mail-Adresse und Ihr Passwort aktualisieren.","MY_TICKETS":"Meine Tickets","MY_TICKETS_DESC":"Tickets f\u00fcr zuk\u00fcnftige Veranstaltungen anzeigen","PAST_EVENTS":"Meine vergangenen Veranstaltungen","PAST_EVENTS_DESC":"Vergangene Veranstaltungen anzeigen","EDIT_ADDRESS":"Adresse aktualisieren","EDIT_ADDRESS_DESC":"Hier k\u00f6nnen Sie Ihre Adresse \u00e4ndern.","NEWSLETTER":"Einstellungen","NEWSLETTER_DESC":"Einstellungen aktualisieren"},"forgottenPasswordModule":{"FORGOT_PASSWORD":"Neues Passwort anfordern","HEADER_FORGOT_PASSWORD_TEXT":"Bitte geben Sie die mit Ihrem Konto verkn\u00fcpfte E-Mail-Adresse ein. Sie erhalten dann per E-Mail ein neues tempor\u00e4res Passwort von uns.","HEADER_FORGOT_PASSWORD_SUBMIT":"Absenden","HEADER_FORGOT_PASSWORD_CONFIRM_TEXT_HEADER":"Ihr Passwort wurde versandt.","HEADER_FORGOT_PASSWORD_CONFIRM_TEXT":"Wir haben Ihnen ein tempor\u00e4res Passwort an die angegebene E-Mail-Adresse geschickt. Aus Sicherheitsgr\u00fcnden bitten wir Sie nach dem Einloggen, ein neues Passwort auszuw\u00e4hlen.<br><br>Sie haben keine E-Mail erhalten? Bitte pr\u00fcfen Sie Ihren Spam-Ordner und stellen Sie sicher, dass Ihre angegebene E-Mail-Adresse korrekt ist.","HEADER_FORGOT_PASSWORD_BUTTON":"Ok","INVALID_FORMAT":"Ung\u00fcltiges Format","VALIDATION_EMAIL":"E-Mail-Adresse muss eine g\u00fcltige E-Mail-Adresse sein"},"searchModule":{"SEARCH":"Suchen","SEARCH_SUBMIT":"Suche","SEARCH_DEFAULT":"K\u00fcnstler, Event, Ort oder Spielst\u00e4tte"},"searchSuggestModule":{"EVENT":"Veranstaltung","EVENTS":"Veranstaltungen","SEE_ALL_RESULTS_FOR":"Alle Suchergebnisse anzeigen f\u00fcr"},"browseEventsModule":{"BROWSE_MODULE_HEADER":"Filtern","BROWSE_MODULE_WHEN":"Wann","BROWSE_MODULE_WHERE":"Wo","GO_BUTTON":"Los","BROWSE_MODULE_LOCATIONS_TITLE":"Bitte w\u00e4hlen Sie einen Ort aus.","BROWSE_LOCATION_CITIES_SEPARATOR":"-------------","BROWSE_MODULE_MAJOR_CATEGORIES_TITLE":"Bitte w\u00e4hlen Sie eine Kategorie aus.","BROWSE_MODULE_MINOR_CATEGORIES_TITLE":"Bitte w\u00e4hlen Sie eine Unterkategorie aus.","BROWSE_MODULE_DATE_DROPDOWN_TITLE":"Bitte w\u00e4hlen Sie einen Zeitraum aus. ","BROWSE_MODULE_CATEGORIES_LONG":"Was?","BROWSE_MODULE_WHEN_LONG":"Wann?","BROWSE_MODULE_WHERE_LONG":"Wo?"}}</script>
+<script type="text/javascript">
+    settings = [];
+    if(typeof settings == "undefined") {
+        settings = {};
+    }
+</script>
+	    <script src="../../cdn-at/mnxweb63.0.14/static/scripts/components/commons.js"></script>
+		    <script src="../../cdn-at/mnxweb63.0.14/static/scripts/components/head.js"></script>
+	<script src="../../cdn-at/mnxweb63.0.14/static/scripts/vendor/require-2.1.22.min.js" type="text/javascript"></script>
+<script>
+	require.config({
+		baseUrl: "//media.ticketmaster.eu/cdn-at/mnxweb63.0.14",
+		waitSeconds: 10,
+		paths: {"sandbox":"static\/scripts\/sandbox","handlebars":"static\/scripts\/library\/handlebars","modernizr":"static\/scripts\/library\/modernizr-3.2.0-custom.min","omniture-helper":"static\/scripts\/library\/omniture-helper","d3":"static\/scripts\/library\/d3.v3.min","templates":"static\/scripts\/templates\/","common-responsive":"static\/scripts\/library\/common-responsive","utils":"static\/scripts\/library\/utils","components":"static\/scripts\/components\/","eventemitter":"static\/scripts\/library\/eventemitter","smoothScroll":"static\/scripts\/library\/smooth-scroll.min","validation":"static\/scripts\/modules\/validation","noRisk":"static\/scripts\/modules\/checkout\/norisk","jquery":"static\/scripts\/vendor\/jquery-3.4.0.min","core":"static\/scripts\/core.jquery","referrer-tracking":"static\/scripts\/referrer-tracking"},
+		shim: {"handlebars":{"exports":"Handlebars"}}	});
+
+	(function(){
+		var primary = ["core","jquery","referrer-tracking","static\/scripts\/components\/sync_cookie_with_query_string","js\/gtm_loader","js\/containerTagsDataLoader","static\/scripts\/modules\/eventWidget"];
+		var remainingRetries = 3;
+
+		var onSuccess = function(CORE, jQuery) {
+
+            CORE.start_all(settings);
+
+            
+                            window.CORE = CORE;
+                window.jQuery = jQuery;
+                    };
+
+		var handleError = function(err){
+
+			if (err.requireModules) {
+				for (var i = err.requireModules.length; i--;) {
+					require.undef(err.requireModules[i]);
+				}
+			}
+
+			if (remainingRetries > 0){
+				setTimeout(function() {
+   					require(primary, function(){/*do nothing*/}, handleError)
+   				}, 1000);
+   				remainingRetries -= 1;
+			}
+
+		}
+
+		require.onError = function(error){
+			if (error.requireType != 'mismatch' && error.requireType != 'notloaded') {
+				console && console.log(error);
+			}
+			console.log(' -- REQUIRE JS FAIL -- ');
+            console.log(error);
+            console.log(error.requireType);
+            console.log('modules: ' + error.requireModules);
+            // commenting it just in case, since it is not caught anywhere...and it might be that I am only experiencing this Error being thrown in DEV ENV...maybe webpack disables error throwing on production? //@TODO to investigate behaviour
+            //throw error;
+		};
+
+		require(primary, onSuccess, handleError);
+	})();
+
+    var tmRequireJsLibraries = function() {
+
+        // a hack just in case some other external scripts (on which these here are dependent) have a chance to be downloaded
+        setTimeout(function(){
+                        require(["\/static\/scripts\/modules\/monetate.js"]);
+            
+                    },800);
+
+    };
+
+    var tmRequireJsElement = new TMJavascriptElement(
+        TMResourceType.EXECUTABLE,
+        tmRequireJsLibraries,
+        undefined,
+        'Element - RequireJs'
+    );
+
+    var tmRequireJsMember = new TMJavascriptMember([tmRequireJsElement], 'RequireJs');
+
+    TMJavascriptFunctionalQueue.addMember(tmRequireJsMember);
+
+</script>
+
+
+
+
+	<div id="gtmModule">
+		<noscript>
+			<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NMSNF2L" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+		</noscript>
+	</div>
+    <div id="containerDataTags" class="containerDataTags" data-tags='{"market":"austria","language":"de-at","pageType":"staticPage"}'></div>
+</div></div></div></body>
+</html>

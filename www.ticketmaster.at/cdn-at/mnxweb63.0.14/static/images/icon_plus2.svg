@@ -1,0 +1,9 @@
+<svg
+    viewBox="0 0 13 13"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="#475058"
+    width="24"
+    height="24"
+    class="icon__plus2">
+    <path d="M5.359 13V7.606H0V5.353h5.359V0h2.283v5.353H13v2.253H7.642V13z" />
+</svg>

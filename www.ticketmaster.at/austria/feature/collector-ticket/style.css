@@ -1,0 +1,422 @@
+/******************************************/
+
+
+/*****************NEW FONTS****************/
+
+
+/******************************************/
+
+@font-face {
+  font-family: "AvertaLightItalic";
+  src: url("https://s3.eu-west-1.amazonaws.com/prd273.tm-intl-pci.mfol.prod1.eu-west-1.tmaws-static-pages/media/tmeu/austria/feature/_font/averta-lightitalic-webfont.woff2") format("woff2"), url("https://s3.eu-west-1.amazonaws.com/prd273.tm-intl-pci.mfol.prod1.eu-west-1.tmaws-static-pages/media/tmeu/austria/feature/_font/averta-lightitalic-webfont.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "AvertaRegular";
+  src: url("https://s3.eu-west-1.amazonaws.com/prd273.tm-intl-pci.mfol.prod1.eu-west-1.tmaws-static-pages/media/tmeu/austria/feature/_font/averta-regular-webfont.woff2") format("woff2"), url("https://s3.eu-west-1.amazonaws.com/prd273.tm-intl-pci.mfol.prod1.eu-west-1.tmaws-static-pages/media/tmeu/austria/feature/_font/averta-regular-webfont.woff") format("woff");
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "AvertaSemiBold";
+  src: url("https://s3.eu-west-1.amazonaws.com/prd273.tm-intl-pci.mfol.prod1.eu-west-1.tmaws-static-pages/media/tmeu/austria/feature/_font/averta-semibold-webfont.woff2") format("woff2"), url("https://s3.eu-west-1.amazonaws.com/prd273.tm-intl-pci.mfol.prod1.eu-west-1.tmaws-static-pages/media/tmeu/austria/feature/_font/averta-semibold-webfont.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+}
+
+
+/******************************************/
+
+
+/*****************WRAPPER******************/
+
+
+/******************************************/
+
+.staticpage *{
+  box-sizing: border-box;
+}
+
+.staticpage .collector-ticket-wrapper {
+  max-width: 1000px;
+  display: block;
+}
+
+.staticpage .module {
+  background-color: #fff;
+}
+
+
+/******************************************/
+
+
+/*****************HEADER*******************/
+
+
+/******************************************/
+
+
+
+
+
+/******************************************/
+
+
+/*******************LOGO*******************/
+
+
+/******************************************/
+
+
+.staticpage h1{
+  margin-top:0;
+}
+
+.staticpage .CT_logo {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+  display: block;
+  padding: 0 20px 20px;
+}
+
+.staticpage .main-tagline {
+  margin-top: 0;
+  font-family: "AvertaLightItalic", sans-serif;
+  font-size: 1.875em;
+  color: #262626;
+  text-align: center;
+  font-weight: 300;
+}
+
+
+/******************************************/
+
+
+/*******************INTRO******************/
+
+
+/******************************************/
+
+.staticpage .text-image {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  max-width: 1000px;
+  flex-wrap: wrap-reverse;
+}
+
+.staticpage .text p {
+  font-family: "AvertaRegular", sans-serif;
+  font-size: 1em;
+  color: #262626;
+  font-weight: 300;
+}
+
+
+/******************************************/
+
+
+/********************FAQ*******************/
+
+
+/******************************************/
+.staticpage .wrapper {
+  float:left;
+  width: 100%;
+  padding: 0 20px;
+}
+.staticpage .faq {
+  width: 100%;
+  max-width: 1500px;
+  margin: 10px 0 60px;
+  padding: 20px;
+  border: 1px solid #026cdf;
+}
+
+
+.staticpage .FAQ_title {
+  font-family: "AvertaSemiBold", sans-serif;
+  font-weight: 400;
+  font-size: 30px;
+  color: #262626;
+  text-align: center;
+}
+
+.staticpage .faq_section{
+  padding: 10px 0;
+}
+
+.staticpage .faq_section p {
+  font-size: 15px;
+  color: #262626;
+  margin-top: 1%;
+  font-family: "AvertaRegular", sans-serif;
+}
+
+.staticpage .faq_section .disclaimer p {
+  font-family: "AvertaRegular", sans-serif;
+}
+
+.staticpage p.question {
+  font-family: "AvertaSemiBold", sans-serif;
+}
+
+
+
+.staticpage a {
+  color: #026cdf;
+  text-decoration: none;
+}
+
+
+/******************************************/
+
+
+/*****************TICKETS******************/
+
+
+/******************************************/
+
+.staticpage .ct-examples {
+  margin: 70px auto;
+  display: block;
+  max-width: 1000px;
+}
+
+.staticpage .ct-examples-bg {
+  background-color: #F6F6F6;
+  padding: 1px;
+}
+
+.staticpage .ct-examples .ticket-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 30px auto;
+  align-items: center;
+}
+
+.staticpage .ct-examples .ticket-wrapper .ticket {
+  display: flex;
+  flex-direction: column;
+}
+
+.staticpage .ct-examples .ticket-wrapper .ticket p {
+  font-size: 15px;
+  color: #1F262D;
+}
+
+.staticpage .ct-examples .ticket-wrapper .ticket .ticket-title {
+  font-family: "AvertaSemiBold", sans-serif;
+}
+
+.staticpage .ct-examples .ticket-wrapper .ticket .ticket-desc {
+  font-family: "AvertaRegular", sans-serif;
+}
+
+.staticpage .ct-examples .ticket-wrapper .ticket .ticket-venue {
+  font-family: "AvertaRegular", sans-serif;
+}
+
+.staticpage .ct-examples .ticket-wrapper .ticket a {
+  background-color: #026cdf;
+  border: none;
+  display: block;
+  padding: 10px 30px;
+  border-radius: 2px;
+  color: #fff;
+  text-align: center;
+  font-family: "AvertaSemiBold", sans-serif;
+  text-decoration: none;
+}
+
+.ticket-section-title {
+  font-family: "AvertaRegular", sans-serif;
+  font-size: 22px;
+  text-align: center;
+  margin: 0 20px;
+  display: block;
+}
+
+
+/******************************************/
+
+
+/***************PAST EVENTS****************/
+
+
+/******************************************/
+
+.staticpage .past {
+  display: none !important;
+}
+
+
+/******************************************/
+
+
+/*******************MEDIA******************/
+
+
+/******************************************/
+
+
+/*Small devices ( 320px and up)*/
+
+@media only screen and (min-width: 320px) {
+  .staticpage .text {
+    float: left;
+    width: 100%;
+    padding: 30px 20px;
+    display: block;
+  }
+  .staticpage .image {
+    max-width: 100%;
+  }
+  .staticpage .image img {
+    max-width: 60%;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .staticpage .ct-examples .ticket-wrapper .ticket {
+    width: 88%;
+    margin: 6%;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket img {
+    max-width: 55%;
+    display: block;
+    margin: 0 auto;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket .ticket-title {
+    margin: 20px;
+    text-align: center;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket .ticket-desc {
+    margin: 0;
+    text-align: center;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket .ticket-venue {
+    margin: 15px;
+    text-align: center;
+    font-size: 14px;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket a {
+    margin: 10px auto;
+    display: block;
+  }
+}
+
+
+/*Medium devices (tablets, 768px and up)*/
+
+@media only screen and (min-width: 768px) {
+
+  .staticpage .text {
+    max-width: 80%;
+    margin: 30px auto;
+    display: block;
+  }
+  .staticpage .image {
+    max-width: 100%;
+  }
+  .staticpage .image img {
+    max-width: 60%;
+    display: block;
+    margin: 0 auto;
+  }
+  .staticpage .faq {
+    padding: 20px 40px;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket {
+    width: 44%;
+    margin: 3%;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket .ticket-title {
+    text-align: center;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket .ticket-desc {
+    text-align: center;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket .ticket-venue {
+    font-size: 14px;
+    text-align: center;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket a {
+    margin: 0 auto;
+    display: block;
+  }
+}
+
+
+/*Large devices (desktops, 1000px and up)*/
+
+@media only screen and (min-width: 1000px) {
+  .staticpage .text {
+    max-width: 70%;
+    margin: 30px auto;
+    display: block;
+  }
+
+  .staticpage .text p {
+    line-height: 1.5;
+    display: inline-block;
+    max-width: 70%;
+  }
+  .staticpage .image {
+    max-width: 30%;
+  }
+  .staticpage .image img {
+    max-width: 70%;
+  }
+  .staticpage .faq {
+    margin: 60px auto;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket {
+    width: 22%;
+    margin: 1.5%;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket img {
+    max-width: 75%;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket .ticket-title {
+    margin: 15px 0 0 27px;
+    text-align: left;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket .ticket-desc {
+    margin: 8px 10px 0 27px;
+    text-align: left;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket .ticket-venue {
+    margin: 8px 10px 10px 27px;
+    font-size: 14px;
+    text-align: left;
+  }
+  .staticpage .ct-examples .ticket-wrapper .ticket a {
+    margin: 10px 30px 10px  30px;
+  }
+}
+
+.staticpage .skew {
+  float: left;
+  width: 100%;
+  overflow: hidden;
+}
+
+.staticpage .skew img {
+  width:100%;
+}
+
+@media only screen and (min-width: 1200px) {
+  .staticpage .parallax{
+    margin-top: -70px;
+  }
+}
+
+@media only screen and (min-width: 1500px) {
+  .staticpage .parallax{
+    margin-top: -90px;
+  }
+}

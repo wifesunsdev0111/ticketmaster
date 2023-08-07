@@ -1,0 +1,9 @@
+<svg
+    viewBox="0 0 13 2"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="#475058"
+    width="24"
+    height="24"
+    className="icon__minus2">
+    <path d="M0 2V0h13v2z" />
+</svg>
